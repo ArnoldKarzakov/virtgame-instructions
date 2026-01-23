@@ -15,16 +15,66 @@
     </div>
 
     <section class="stage">
-      <div id="pill" class="pill">Инструкция для Xbox ключей</div>
+      <div class="headerRow">
+        <div id="pill" class="pill">Инструкция для Xbox ключей</div>
+        <button id="helpBtn" class="helpBtn">Помощь</button>
+      </div>
 
       <div class="card">
         <div id="content"></div>
 
         <div class="footer">
-          <button id="next" class="btn">Продолжить</button>
+          <button id="next" class="btn">Далее</button>
         </div>
       </div>
     </section>
+
+    <!-- HELP MODAL -->
+    <div id="helpModal" class="modal" aria-hidden="true">
+      <div class="modalSheet">
+        <button class="modalClose" id="helpClose" aria-label="close">×</button>
+        <div class="modalTitle">Как связаться с поддержкой?</div>
+        <div class="modalBody">
+          <div class="modalText">
+            Чтобы мы могли помочь быстро и по делу, сразу приложите:
+            <ul>
+              <li>скриншот ошибки на сайте Microsoft при активации кода;</li>
+              <li>скриншот окна VPN;</li>
+            </ul>
+            Без этих данных оператору всё равно придется задавать уточняющие вопросы, и решение займёт больше времени.
+            <ul>
+              <li>Перейдите в раздел «Заказы» в приложении Яндекс.Маркет</li>
+              <li>Нажмите кнопку «Чат с продавцом»:</li>
+            </ul>
+          </div>
+
+          <!-- OPTIONAL: add image like your mock -->
+          <div class="imgwrap">
+            <img class="img wide" src="assets/help.png" alt="Как открыть чат с продавцом"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERMS MODAL -->
+    <div id="termsModal" class="modal" aria-hidden="true">
+      <div class="modalSheet">
+        <button class="modalClose" id="termsClose" aria-label="close">×</button>
+        <div class="modalTitle">Условия использования VPN</div>
+        <div class="modalBody">
+          <div class="modalText">
+            <ul>
+              <li>VPN предоставляется в соответствии с ФЗ-149 «Об информации…» и предназначен только для шифрования соединения при активации кода/ключа.</li>
+              <li>Запрещено использовать VPN для обхода блокировок и доступа к ресурсам, ограниченным на территории РФ, а также для любых незаконных действий.</li>
+              <li>Сервис не рекламируется как средство обхода ограничений; инструкции по обходу блокировок не предоставляются.</li>
+              <li>Пользователь несёт персональную ответственность за соблюдение законодательства РФ.</li>
+              <li>Работоспособность конкретного VPN зависит от вашего провайдера и самого VPN и не контролируется магазином. Мы отвечаем только за корректность и работоспособность игрового кода Xbox.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script src="flow.js"></script>
