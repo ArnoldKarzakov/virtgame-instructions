@@ -8,17 +8,19 @@
 </head>
 <body>
   <main class="app">
+
+    <!-- TOP BAR: progress + help -->
     <div class="top">
-      <div class="progress" aria-label="progress">
-        <div id="bar" class="bar"></div>
+      <div class="topInner">
+        <div class="progress" aria-label="progress">
+          <div id="bar" class="bar"></div>
+        </div>
+        <button id="helpBtn" class="helpBtnTop">Помощь</button>
       </div>
     </div>
 
     <section class="stage">
-      <div class="headerRow">
-        <div id="pill" class="pill">Инструкция для Xbox ключей</div>
-        <button id="helpBtn" class="helpBtn">Помощь</button>
-      </div>
+      <div id="pill" class="pill">Инструкция для Xbox ключей</div>
 
       <div class="card">
         <div id="content"></div>
@@ -44,13 +46,13 @@
             Без этих данных оператору всё равно придется задавать уточняющие вопросы, и решение займёт больше времени.
             <ul>
               <li>Перейдите в раздел «Заказы» в приложении Яндекс.Маркет</li>
-              <li>Нажмите кнопку «Чат с продавцом»:</li>
+              <li>Нажмите кнопку «Чат с продавцом»</li>
             </ul>
           </div>
 
-          <!-- OPTIONAL: add image like your mock -->
+          <!-- если не хочешь картинку - просто удали этот блок -->
           <div class="imgwrap">
-            <img class="img wide" src="assets/help.png" alt="Как открыть чат с продавцом"/>
+            <img class="img wide" src="assets/help.png" alt="Чат с продавцом"/>
           </div>
         </div>
       </div>
@@ -68,7 +70,7 @@
               <li>Запрещено использовать VPN для обхода блокировок и доступа к ресурсам, ограниченным на территории РФ, а также для любых незаконных действий.</li>
               <li>Сервис не рекламируется как средство обхода ограничений; инструкции по обходу блокировок не предоставляются.</li>
               <li>Пользователь несёт персональную ответственность за соблюдение законодательства РФ.</li>
-              <li>Работоспособность конкретного VPN зависит от вашего провайдера и самого VPN и не контролируется магазином. Мы отвечаем только за корректность и работоспособность игрового кода Xbox.</li>
+              <li>Работоспособность VPN зависит от вашего провайдера и самого VPN и не контролируется магазином. Мы отвечаем только за корректность и работоспособность игрового кода Xbox.</li>
             </ul>
           </div>
         </div>
