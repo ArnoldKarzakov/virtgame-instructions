@@ -1,0 +1,20 @@
+:root { color-scheme: dark; }
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Arial;
+background:#000;color:#fff;}
+.wrap{max-width:520px;margin:0 auto;padding:22px 18px 28px;}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.progress{flex:1;height:6px;background:#2a2a2a;border-radius:999px;overflow:hidden;}
+.bar{height:100%;width:0%;background:#3b82f6;border-radius:999px;transition:width .25s;}
+.close{background:transparent;border:0;color:#4f8cff;font-size:16px;}
+h1{font-size:40px;line-height:1.05;margin:18px 0 18px;}
+.subtitle{opacity:.75;margin:0 0 10px;}
+.options{display:flex;flex-direction:column;gap:10px;margin:14px 0 18px;}
+.opt{display:flex;align-items:center;justify-content:space-between;
+padding:16px 16px;border-radius:16px;background:#111;border:1px solid #1f1f1f;
+font-size:18px;}
+.opt.selected{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.25) inset;}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid #3a3a3a;}
+.opt.selected .dot{border-color:#3b82f6;background:#3b82f6;}
+.next{width:100%;padding:18px 16px;border-radius:16px;border:0;
+background:#ffd400;color:#000;font-weight:700;font-size:18px;}
+.next:disabled{opacity:.35}
