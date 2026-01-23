@@ -1,26 +1,31 @@
 const $ = (id) => document.getElementById(id);
 
+const REGIONS = [
+  "США","Австралия","Аргентина","Великобритания","Германия","Греция","Гонконг",
+  "Индия","Мексика","Новая Зеландия","Норвегия","Сингапур","Тайвань","Турция",
+  "Украина","Швеция","Южная Корея","Япония"
+];
+
 const state = {
-  region: "Турция",
+  region: REGIONS[0],
   vpnNeeded: true,
-  hasXboxApp: true,
+  vpnTermsAccepted: false,
 };
 
-// Тестовый ssconf (поставь свой реальный)
 const SS_CONF = "ssconf://obeshbarmak.kz/vanya/e537633a-afe9-43ef-98af-660a1d25f444";
 
 const steps = [
   {
     key: "params",
-    progress: 5,
+    progress: 8,
     pill: "Инструкция для Xbox ключей",
+    nextLabel: "Далее",
     render: () => `
-      <div class="h1">Укажите параметры ключа, инструкция подстроится под вас.</div>
+      <div class="h1">Ваш регион ключа? (Указан в письме от Яндекс, в скобках справа от ключа)</div>
 
-      <div class="label">Ваш регион ключа</div>
+      <div class="label">Регион ⌄</div>
       <select class="select" id="region">
-        ${["Шенген","Россия","Турция","ОАЭ","Армения","Грузия","Таиланд","Сербия","Италия","Весь мир"]
-          .map(r => `<option value="${r}" ${state.region===r?"selected":""}>${r}</option>`).join("")}
+        ${REGIONS.map(r => `<option value="${r}" ${state.region===r?"selected":""}>${r}</option>`).join("")}
       </select>
 
       <div class="label">Вам нужен VPN?</div>
@@ -29,31 +34,53 @@ const steps = [
         <button class="seg-btn ${!state.vpnNeeded?"active":""}" id="vpnNo">Нет</button>
       </div>
 
-      <div class="label">У вас есть приложение Xbox App?</div>
-      <div class="segment" role="tablist" aria-label="xboxapp">
-        <button class="seg-btn ${state.hasXboxApp?"active":""}" id="appYes">Да</button>
-        <button class="seg-btn ${!state.hasXboxApp?"active":""}" id="appNo">Нет</button>
-      </div>
+      ${state.vpnNeeded ? `
+        <div class="checkboxRow">
+          <div class="label">Условия использования VPN (нажмите для ознакомления)</div>
+          <button class="termsLink" id="openTerms">Ознакомиться с условиями</button>
+
+          <label class="check">
+            <input type="checkbox" id="acceptTerms" ${state.vpnTermsAccepted ? "checked":""}/>
+            <span>Я согласен, с условиями</span>
+          </label>
+        </div>
+      ` : ``}
+
+      <div class="beta">БЕТА ВЕРСИЯ</div>
     `,
     onMount: () => {
       $("region").onchange = (e) => state.region = e.target.value;
 
-      $("vpnYes").onclick = () => { state.vpnNeeded = true; render(); };
-      $("vpnNo").onclick  = () => { state.vpnNeeded = false; render(); };
+      $("vpnYes").onclick = () => {
+        state.vpnNeeded = true;
+        render();
+      };
+      $("vpnNo").onclick  = () => {
+        state.vpnNeeded = false;
+        state.vpnTermsAccepted = false;
+        render();
+      };
 
-      $("appYes").onclick = () => { state.hasXboxApp = true; render(); };
-      $("appNo").onclick  = () => { state.hasXboxApp = false; render(); };
+      if (state.vpnNeeded) {
+        $("openTerms").onclick = () => openModal("termsModal");
+        $("acceptTerms").onchange = (e) => {
+          state.vpnTermsAccepted = e.target.checked;
+          syncNextDisabled();
+        };
+      }
+      syncNextDisabled();
     },
-    next: () => state.vpnNeeded ? "step2" : "doneNoVpn"
+    next: () => (state.vpnNeeded ? "step2" : "doneNoVpn")
   },
 
   {
     key: "step2",
-    progress: 20,
+    progress: 28,
     pill: "Шаг 2. Скачиваем VPN",
+    nextLabel: "Продолжить",
     render: () => `
       <div class="h1">Скачиваем Дядя Ваня VPN на ваше устройство по ссылке ниже</div>
-      <div class="p">Ссылка: <span style="font-weight:900;">vanyavpn.as/app</span></div>
+      <div class="p">Ссылка: <span style="font-weight:950;">vanyavpn.as/app</span></div>
       <div class="p">Выбираем из списка ваше устройство и устанавливаем.</div>
       <div class="imgwrap"><img class="img" src="assets/step2.png" alt="Step 2"/></div>
     `,
@@ -62,8 +89,9 @@ const steps = [
 
   {
     key: "step3",
-    progress: 40,
+    progress: 50,
     pill: "Шаг 3. Устанавливаем VPN",
+    nextLabel: "Продолжить",
     render: () => `
       <div class="h1">Устанавливаем приложение и заходим в него, вы увидите следующий экран:</div>
       <div class="imgwrap"><img class="img" src="assets/step3.png" alt="Step 3"/></div>
@@ -73,15 +101,21 @@ const steps = [
 
   {
     key: "step4",
-    progress: 60,
+    progress: 70,
     pill: "Шаг 4. Добавляем VPN",
+    nextLabel: "Продолжить",
     render: () => `
       <div class="h1">Скопируйте ключ ниже, далее нажмите «Добавить ключ Дяди Вани» и вставьте ключ.</div>
-      <div class="code" id="ssconf">${SS_CONF}</div>
-      <div class="row">
-        <button class="small" id="copy">Скопировать</button>
-        <button class="small" id="open">Открыть ссылку</button>
+      <div class="p" style="font-weight:900;margin-bottom:10px;">${SS_CONF}</div>
+
+      <div class="hr"></div>
+
+      <div class="p" style="margin-bottom:10px;">Нажмите «Открыть ссылку», если устройство поддерживает ssconf — откроется приложение.</div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn" id="copy">Скопировать</button>
+        <button class="btn" id="open">Открыть ссылку</button>
       </div>
+
       <div class="imgwrap"><img class="img" src="assets/step4.png" alt="Step 4"/></div>
     `,
     onMount: () => {
@@ -92,18 +126,16 @@ const steps = [
           setTimeout(()=>$("copy").textContent="Скопировать", 1100);
         } catch {}
       };
-      $("open").onclick = () => {
-        // если iOS/Android поддерживает ssconf, откроется сразу приложение
-        window.location.href = SS_CONF;
-      };
+      $("open").onclick = () => { window.location.href = SS_CONF; };
     },
     next: () => "step5"
   },
 
   {
     key: "step5",
-    progress: 80,
+    progress: 88,
     pill: "Шаг 5. Проверяем VPN",
+    nextLabel: "Продолжить",
     render: () => `
       <div class="h1">После успешного добавления появится вот такое изображение</div>
       <div class="imgwrap"><img class="img" src="assets/step5.png" alt="Step 5"/></div>
@@ -115,12 +147,12 @@ const steps = [
     key: "doneNoVpn",
     progress: 100,
     pill: "Готово",
+    nextLabel: "В начало",
     render: () => `
       <div class="h1">VPN не нужен</div>
-      <div class="p">Регион ключа: <span style="font-weight:900;">${state.region}</span></div>
-      <div class="p">Xbox App: <span style="font-weight:900;">${state.hasXboxApp ? "Есть" : "Нет"}</span></div>
+      <div class="p">Регион ключа: <span style="font-weight:950;">${state.region}</span></div>
       <div class="hr"></div>
-      <div class="p">Дальше я могу показать вам инструкцию активации без VPN (следующим экраном), когда ты добавишь контент.</div>
+      <div class="p">Следующий экран: инструкция активации без VPN (добавим позже).</div>
     `,
     next: () => "params"
   },
@@ -129,12 +161,12 @@ const steps = [
     key: "done",
     progress: 100,
     pill: "Готово",
+    nextLabel: "В начало",
     render: () => `
-      <div class="h1">VPN готов ✅</div>
-      <div class="p">Регион ключа: <span style="font-weight:900;">${state.region}</span></div>
-      <div class="p">Xbox App: <span style="font-weight:900;">${state.hasXboxApp ? "Есть" : "Нет"}</span></div>
+      <div class="h1">VPN готов</div>
+      <div class="p">Регион ключа: <span style="font-weight:950;">${state.region}</span></div>
       <div class="hr"></div>
-      <div class="p">Следующий шаг — экран активации ключа в Microsoft Store / Xbox App (добавим как Step 6).</div>
+      <div class="p">Следующий экран: активация ключа (Step 6) — добавим позже.</div>
     `,
     next: () => "params"
   },
@@ -144,8 +176,35 @@ let currentKey = "params";
 
 function getStep(key){ return steps.find(s => s.key === key); }
 
+function openModal(id){
+  const m = $(id);
+  m.classList.add("show");
+  m.setAttribute("aria-hidden", "false");
+}
+function closeModal(id){
+  const m = $(id);
+  m.classList.remove("show");
+  m.setAttribute("aria-hidden", "true");
+}
+
+function syncNextDisabled(){
+  const s = getStep(currentKey);
+  const nextBtn = $("next");
+
+  if (s.key === "params") {
+    if (state.vpnNeeded) {
+      nextBtn.disabled = !state.vpnTermsAccepted;
+    } else {
+      nextBtn.disabled = false;
+    }
+  } else {
+    nextBtn.disabled = false;
+  }
+}
+
 function render(){
   const s = getStep(currentKey);
+
   $("bar").style.width = `${s.progress}%`;
   $("pill").textContent = s.pill;
 
@@ -155,15 +214,28 @@ function render(){
   void content.offsetWidth;
   content.classList.add("fade");
 
-  if (s.onMount) s.onMount();
-
   const nextBtn = $("next");
-  nextBtn.textContent = (s.key === "step4") ? "Продолжить" : "Продолжить";
+  nextBtn.textContent = s.nextLabel || "Продолжить";
   nextBtn.onclick = () => {
     const nextKey = (typeof s.next === "function") ? s.next() : s.next;
     currentKey = nextKey;
     render();
   };
+
+  if (s.onMount) s.onMount();
+
+  // help button works on every screen
+  $("helpBtn").onclick = () => openModal("helpModal");
+
+  // modal close wiring (once is enough but safe here)
+  $("helpClose").onclick = () => closeModal("helpModal");
+  $("termsClose").onclick = () => closeModal("termsModal");
+
+  // close modals on background click
+  $("helpModal").onclick = (e) => { if (e.target.id === "helpModal") closeModal("helpModal"); };
+  $("termsModal").onclick = (e) => { if (e.target.id === "termsModal") closeModal("termsModal"); };
+
+  syncNextDisabled();
 }
 
 render();
