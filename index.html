@@ -3,23 +3,29 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Инструкция</title>
+  <title>VirtGame - Инструкция</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div class="wrap">
+  <main class="app">
     <div class="top">
-      <div class="progress"><div id="bar" class="bar"></div></div>
-      <button class="close" onclick="window.history.back()">Закрыть</button>
+      <div class="progress" aria-label="progress">
+        <div id="bar" class="bar"></div>
+      </div>
     </div>
 
-    <h1 id="title">Страна поездки</h1>
-    <p id="subtitle" class="subtitle"></p>
+    <section class="stage">
+      <div id="pill" class="pill">Инструкция для Xbox ключей</div>
 
-    <div id="options" class="options"></div>
+      <div class="card">
+        <div id="content"></div>
 
-    <button id="next" class="next" disabled>Продолжить</button>
-  </div>
+        <div class="footer">
+          <button id="next" class="btn">Продолжить</button>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script src="flow.js"></script>
 </body>
