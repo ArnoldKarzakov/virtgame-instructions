@@ -1,9 +1,9 @@
 const $ = (id) => document.getElementById(id);
 
 const REGIONS = [
-  "США","Австралия","Аргентина","Великобритания","Германия","Греция","Гонконг",
-  "Индия","Мексика","Новая Зеландия","Норвегия","Сингапур","Тайвань","Турция",
-  "Украина","Швеция","Южная Корея","Япония"
+  "США","Австралия","Аргентина","Великобритания","Германия","Греция","Гонконг","Индия",
+  "Мексика","Новая Зеландия","Норвегия","Сингапур","Тайвань","Турция","Украина","Швеция",
+  "Южная Корея","Япония"
 ];
 
 const state = {
@@ -12,6 +12,7 @@ const state = {
   vpnTermsAccepted: false,
 };
 
+// Поставь свой реальный ssconf
 const SS_CONF = "ssconf://obeshbarmak.kz/vanya/e537633a-afe9-43ef-98af-660a1d25f444";
 
 const steps = [
@@ -23,7 +24,7 @@ const steps = [
     render: () => `
       <div class="h1">Ваш регион ключа? (Указан в письме от Яндекс, в скобках справа от ключа)</div>
 
-      <div class="label">Регион ⌄</div>
+      <div class="label">Регион</div>
       <select class="select" id="region">
         ${REGIONS.map(r => `<option value="${r}" ${state.region===r?"selected":""}>${r}</option>`).join("")}
       </select>
@@ -51,15 +52,8 @@ const steps = [
     onMount: () => {
       $("region").onchange = (e) => state.region = e.target.value;
 
-      $("vpnYes").onclick = () => {
-        state.vpnNeeded = true;
-        render();
-      };
-      $("vpnNo").onclick  = () => {
-        state.vpnNeeded = false;
-        state.vpnTermsAccepted = false;
-        render();
-      };
+      $("vpnYes").onclick = () => { state.vpnNeeded = true; render(); };
+      $("vpnNo").onclick  = () => { state.vpnNeeded = false; state.vpnTermsAccepted = false; render(); };
 
       if (state.vpnNeeded) {
         $("openTerms").onclick = () => openModal("termsModal");
@@ -80,7 +74,7 @@ const steps = [
     nextLabel: "Продолжить",
     render: () => `
       <div class="h1">Скачиваем Дядя Ваня VPN на ваше устройство по ссылке ниже</div>
-      <div class="p">Ссылка: <span style="font-weight:950;">vanyavpn.as/app</span></div>
+      <div class="p">Ссылка: <span style="font-weight:600;">vanyavpn.as/app</span></div>
       <div class="p">Выбираем из списка ваше устройство и устанавливаем.</div>
       <div class="imgwrap"><img class="img" src="assets/step2.png" alt="Step 2"/></div>
     `,
@@ -106,12 +100,12 @@ const steps = [
     nextLabel: "Продолжить",
     render: () => `
       <div class="h1">Скопируйте ключ ниже, далее нажмите «Добавить ключ Дяди Вани» и вставьте ключ.</div>
-      <div class="p" style="font-weight:900;margin-bottom:10px;">${SS_CONF}</div>
+      <div class="p" style="font-weight:500;margin-bottom:10px;overflow-wrap:anywhere;">${SS_CONF}</div>
 
       <div class="hr"></div>
 
-      <div class="p" style="margin-bottom:10px;">Нажмите «Открыть ссылку», если устройство поддерживает ssconf — откроется приложение.</div>
-      <div style="display:flex;gap:10px;">
+      <div class="p" style="margin-bottom:10px;">Можно нажать «Открыть ссылку», если устройство поддерживает ssconf.</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
         <button class="btn" id="copy">Скопировать</button>
         <button class="btn" id="open">Открыть ссылку</button>
       </div>
@@ -123,7 +117,7 @@ const steps = [
         try {
           await navigator.clipboard.writeText(SS_CONF);
           $("copy").textContent = "Скопировано";
-          setTimeout(()=>$("copy").textContent="Скопировать", 1100);
+          setTimeout(()=> $("copy").textContent="Скопировать", 1100);
         } catch {}
       };
       $("open").onclick = () => { window.location.href = SS_CONF; };
@@ -150,9 +144,9 @@ const steps = [
     nextLabel: "В начало",
     render: () => `
       <div class="h1">VPN не нужен</div>
-      <div class="p">Регион ключа: <span style="font-weight:950;">${state.region}</span></div>
+      <div class="p">Регион ключа: <span style="font-weight:600;">${state.region}</span></div>
       <div class="hr"></div>
-      <div class="p">Следующий экран: инструкция активации без VPN (добавим позже).</div>
+      <div class="p">Дальше можно добавить экран активации без VPN.</div>
     `,
     next: () => "params"
   },
@@ -164,9 +158,9 @@ const steps = [
     nextLabel: "В начало",
     render: () => `
       <div class="h1">VPN готов</div>
-      <div class="p">Регион ключа: <span style="font-weight:950;">${state.region}</span></div>
+      <div class="p">Регион ключа: <span style="font-weight:600;">${state.region}</span></div>
       <div class="hr"></div>
-      <div class="p">Следующий экран: активация ключа (Step 6) — добавим позже.</div>
+      <div class="p">Следующий шаг — экран активации ключа (Step 6).</div>
     `,
     next: () => "params"
   },
@@ -192,14 +186,23 @@ function syncNextDisabled(){
   const nextBtn = $("next");
 
   if (s.key === "params") {
-    if (state.vpnNeeded) {
-      nextBtn.disabled = !state.vpnTermsAccepted;
-    } else {
-      nextBtn.disabled = false;
-    }
+    nextBtn.disabled = state.vpnNeeded ? !state.vpnTermsAccepted : false;
   } else {
     nextBtn.disabled = false;
   }
+}
+
+function bindGlobalUI(){
+  // Help open
+  $("helpBtn").onclick = () => openModal("helpModal");
+
+  // Close buttons
+  $("helpClose").onclick = () => closeModal("helpModal");
+  $("termsClose").onclick = () => closeModal("termsModal");
+
+  // Close on backdrop
+  $("helpModal").onclick = (e) => { if (e.target.id === "helpModal") closeModal("helpModal"); };
+  $("termsModal").onclick = (e) => { if (e.target.id === "termsModal") closeModal("termsModal"); };
 }
 
 function render(){
@@ -223,19 +226,10 @@ function render(){
   };
 
   if (s.onMount) s.onMount();
-
-  // help button works on every screen
-  $("helpBtn").onclick = () => openModal("helpModal");
-
-  // modal close wiring (once is enough but safe here)
-  $("helpClose").onclick = () => closeModal("helpModal");
-  $("termsClose").onclick = () => closeModal("termsModal");
-
-  // close modals on background click
-  $("helpModal").onclick = (e) => { if (e.target.id === "helpModal") closeModal("helpModal"); };
-  $("termsModal").onclick = (e) => { if (e.target.id === "termsModal") closeModal("termsModal"); };
-
   syncNextDisabled();
 }
+
+bindGlobalUI();
+render();
 
 render();
