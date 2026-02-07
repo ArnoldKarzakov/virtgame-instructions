@@ -1,235 +1,294 @@
-const $ = (id) => document.getElementById(id);
+:root { color-scheme: dark; }
 
-const REGIONS = [
-  "США","Австралия","Аргентина","Великобритания","Германия","Греция","Гонконг","Индия",
-  "Мексика","Новая Зеландия","Норвегия","Сингапур","Тайвань","Турция","Украина","Швеция",
-  "Южная Корея","Япония"
-];
+* { box-sizing: border-box; }
+html, body { height: 100%; }
 
-const state = {
-  region: REGIONS[0],
-  vpnNeeded: true,
-  vpnTermsAccepted: false,
-};
-
-// Поставь свой реальный ssconf
-const SS_CONF = "ssconf://obeshbarmak.kz/vanya/e537633a-afe9-43ef-98af-660a1d25f444";
-
-const steps = [
-  {
-    key: "params",
-    progress: 8,
-    pill: "Инструкция для Xbox ключей",
-    nextLabel: "Далее",
-    render: () => `
-      <div class="h1">Ваш регион ключа? (Указан в письме от Яндекс, в скобках справа от ключа)</div>
-
-      <div class="label">Регион</div>
-      <select class="select" id="region">
-        ${REGIONS.map(r => `<option value="${r}" ${state.region===r?"selected":""}>${r}</option>`).join("")}
-      </select>
-
-      <div class="label">Вам нужен VPN?</div>
-      <div class="segment" role="tablist" aria-label="vpn">
-        <button class="seg-btn ${state.vpnNeeded?"active":""}" id="vpnYes">Да</button>
-        <button class="seg-btn ${!state.vpnNeeded?"active":""}" id="vpnNo">Нет</button>
-      </div>
-
-      ${state.vpnNeeded ? `
-        <div class="checkboxRow">
-          <div class="label">Условия использования VPN (нажмите для ознакомления)</div>
-          <button class="termsLink" id="openTerms">Ознакомиться с условиями</button>
-
-          <label class="check">
-            <input type="checkbox" id="acceptTerms" ${state.vpnTermsAccepted ? "checked":""}/>
-            <span>Я согласен, с условиями</span>
-          </label>
-        </div>
-      ` : ``}
-
-      <div class="beta">БЕТА ВЕРСИЯ</div>
-    `,
-    onMount: () => {
-      $("region").onchange = (e) => state.region = e.target.value;
-
-      $("vpnYes").onclick = () => { state.vpnNeeded = true; render(); };
-      $("vpnNo").onclick  = () => { state.vpnNeeded = false; state.vpnTermsAccepted = false; render(); };
-
-      if (state.vpnNeeded) {
-        $("openTerms").onclick = () => openModal("termsModal");
-        $("acceptTerms").onchange = (e) => {
-          state.vpnTermsAccepted = e.target.checked;
-          syncNextDisabled();
-        };
-      }
-      syncNextDisabled();
-    },
-    next: () => (state.vpnNeeded ? "step2" : "doneNoVpn")
-  },
-
-  {
-    key: "step2",
-    progress: 28,
-    pill: "Шаг 2. Скачиваем VPN",
-    nextLabel: "Продолжить",
-    render: () => `
-      <div class="h1">Скачиваем Дядя Ваня VPN на ваше устройство по ссылке ниже</div>
-      <div class="p">Ссылка: <span style="font-weight:600;">vanyavpn.as/app</span></div>
-      <div class="p">Выбираем из списка ваше устройство и устанавливаем.</div>
-      <div class="imgwrap"><img class="img" src="assets/step2.png" alt="Step 2"/></div>
-    `,
-    next: () => "step3"
-  },
-
-  {
-    key: "step3",
-    progress: 50,
-    pill: "Шаг 3. Устанавливаем VPN",
-    nextLabel: "Продолжить",
-    render: () => `
-      <div class="h1">Устанавливаем приложение и заходим в него, вы увидите следующий экран:</div>
-      <div class="imgwrap"><img class="img" src="assets/step3.png" alt="Step 3"/></div>
-    `,
-    next: () => "step4"
-  },
-
-  {
-    key: "step4",
-    progress: 70,
-    pill: "Шаг 4. Добавляем VPN",
-    nextLabel: "Продолжить",
-    render: () => `
-      <div class="h1">Скопируйте ключ ниже, далее нажмите «Добавить ключ Дяди Вани» и вставьте ключ.</div>
-      <div class="p" style="font-weight:500;margin-bottom:10px;overflow-wrap:anywhere;">${SS_CONF}</div>
-
-      <div class="hr"></div>
-
-      <div class="p" style="margin-bottom:10px;">Можно нажать «Открыть ссылку», если устройство поддерживает ssconf.</div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn" id="copy">Скопировать</button>
-        <button class="btn" id="open">Открыть ссылку</button>
-      </div>
-
-      <div class="imgwrap"><img class="img" src="assets/step4.png" alt="Step 4"/></div>
-    `,
-    onMount: () => {
-      $("copy").onclick = async () => {
-        try {
-          await navigator.clipboard.writeText(SS_CONF);
-          $("copy").textContent = "Скопировано";
-          setTimeout(()=> $("copy").textContent="Скопировать", 1100);
-        } catch {}
-      };
-      $("open").onclick = () => { window.location.href = SS_CONF; };
-    },
-    next: () => "step5"
-  },
-
-  {
-    key: "step5",
-    progress: 88,
-    pill: "Шаг 5. Проверяем VPN",
-    nextLabel: "Продолжить",
-    render: () => `
-      <div class="h1">После успешного добавления появится вот такое изображение</div>
-      <div class="imgwrap"><img class="img" src="assets/step5.png" alt="Step 5"/></div>
-    `,
-    next: () => "done"
-  },
-
-  {
-    key: "doneNoVpn",
-    progress: 100,
-    pill: "Готово",
-    nextLabel: "В начало",
-    render: () => `
-      <div class="h1">VPN не нужен</div>
-      <div class="p">Регион ключа: <span style="font-weight:600;">${state.region}</span></div>
-      <div class="hr"></div>
-      <div class="p">Дальше можно добавить экран активации без VPN.</div>
-    `,
-    next: () => "params"
-  },
-
-  {
-    key: "done",
-    progress: 100,
-    pill: "Готово",
-    nextLabel: "В начало",
-    render: () => `
-      <div class="h1">VPN готов</div>
-      <div class="p">Регион ключа: <span style="font-weight:600;">${state.region}</span></div>
-      <div class="hr"></div>
-      <div class="p">Следующий шаг — экран активации ключа (Step 6).</div>
-    `,
-    next: () => "params"
-  },
-];
-
-let currentKey = "params";
-
-function getStep(key){ return steps.find(s => s.key === key); }
-
-function openModal(id){
-  const m = $(id);
-  m.classList.add("show");
-  m.setAttribute("aria-hidden", "false");
-}
-function closeModal(id){
-  const m = $(id);
-  m.classList.remove("show");
-  m.setAttribute("aria-hidden", "true");
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display",Arial,sans-serif;
+  background: radial-gradient(1200px 800px at 50% 18%, #2b2b2b 0%, #0b0b0b 40%, #000 70%);
+  color:#fff;
 }
 
-function syncNextDisabled(){
-  const s = getStep(currentKey);
-  const nextBtn = $("next");
-
-  if (s.key === "params") {
-    nextBtn.disabled = state.vpnNeeded ? !state.vpnTermsAccepted : false;
-  } else {
-    nextBtn.disabled = false;
-  }
+.app{
+  min-height:100%;
+  display:flex;
+  justify-content:center;
+  padding:24px 14px 34px;
 }
 
-function bindGlobalUI(){
-  // Help open
-  $("helpBtn").onclick = () => openModal("helpModal");
-
-  // Close buttons
-  $("helpClose").onclick = () => closeModal("helpModal");
-  $("termsClose").onclick = () => closeModal("termsModal");
-
-  // Close on backdrop
-  $("helpModal").onclick = (e) => { if (e.target.id === "helpModal") closeModal("helpModal"); };
-  $("termsModal").onclick = (e) => { if (e.target.id === "termsModal") closeModal("termsModal"); };
+/* TOP BAR: progress + help */
+.top{
+  position:fixed;
+  top:14px;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:center;
+  z-index:10;
 }
 
-function render(){
-  const s = getStep(currentKey);
-
-  $("bar").style.width = `${s.progress}%`;
-  $("pill").textContent = s.pill;
-
-  const content = $("content");
-  content.classList.remove("fade");
-  content.innerHTML = s.render();
-  void content.offsetWidth;
-  content.classList.add("fade");
-
-  const nextBtn = $("next");
-  nextBtn.textContent = s.nextLabel || "Продолжить";
-  nextBtn.onclick = () => {
-    const nextKey = (typeof s.next === "function") ? s.next() : s.next;
-    currentKey = nextKey;
-    render();
-  };
-
-  if (s.onMount) s.onMount();
-  syncNextDisabled();
+.topInner{
+  width:min(420px, calc(100vw - 28px));
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-bindGlobalUI();
-render();
+.progress{
+  flex:1;
+  height:6px;
+  background: rgba(255,255,255,.15);
+  border-radius: 999px;
+  overflow:hidden;
+  backdrop-filter: blur(12px);
+}
 
-render();
+.bar{
+  height:100%;
+  width:0%;
+  background: rgba(255,255,255,.65);
+  border-radius: 999px;
+  transition: width .25s ease;
+}
+
+.helpBtnTop{
+  padding: 9px 12px;
+  border-radius: 999px;
+  border:0;
+  background:#b91c1c;
+  color:#fff;
+  font-weight:600;
+  font-size:14px;
+}
+
+.stage{
+  width:min(420px, calc(100vw - 28px));
+  margin-top:22px;
+}
+
+.pill{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px 22px;
+  border-radius:999px;
+  background: rgba(255,255,255,.25);
+  box-shadow:0 8px 30px rgba(0,0,0,.45);
+  backdrop-filter: blur(14px);
+  font-weight:700;
+  font-size:18px;
+  letter-spacing:.2px;
+  text-align:center;
+  margin: 52px 0 18px; /* чтобы не налезало на top bar */
+}
+
+.card{
+  border-radius:34px;
+  padding:22px 20px 18px;
+  background: rgba(200,200,200,.55);
+  box-shadow:0 25px 70px rgba(0,0,0,.55);
+  backdrop-filter: blur(18px);
+  color:#0b0b0b;
+}
+
+/* TYPOGRAPHY: жирный только заголовок */
+.h1{
+  font-size:18px;
+  font-weight:800;
+  line-height:1.15;
+  margin:0 0 12px;
+}
+
+.p{
+  margin:0 0 12px;
+  font-size:15px;
+  line-height:1.25;
+  color: rgba(0,0,0,.82);
+  font-weight:500;
+}
+
+.label{
+  margin:14px 0 8px;
+  font-weight:600;
+  font-size:15px;
+  color: rgba(0,0,0,.88);
+}
+
+.select{
+  width:100%;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(0,0,0,.12);
+  background: rgba(255,255,255,.55);
+  outline:none;
+  font-size:16px;
+  font-weight:500;
+}
+
+.segment{
+  width:100%;
+  display:flex;
+  border-radius:18px;
+  padding:3px;
+  background: rgba(0,0,0,.12);
+  border:1px solid rgba(0,0,0,.12);
+  overflow:hidden;
+}
+.seg-btn{
+  flex:1;
+  padding:10px 10px;
+  border:0;
+  background: transparent;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:600;
+  color: rgba(0,0,0,.72);
+}
+.seg-btn.active{
+  background: rgba(255,255,255,.95);
+  color:#0b0b0b;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+
+.hr{
+  height:1px;
+  background: rgba(0,0,0,.16);
+  margin:14px 0 10px;
+}
+
+/* Terms / checkbox */
+.checkboxRow{ margin-top:14px; }
+
+.termsLink{
+  display:inline-block;
+  margin: 8px 0 10px;
+  font-weight:500;
+  color: rgba(0,0,0,.78);
+  text-decoration: underline;
+  background: transparent;
+  border:0;
+  padding:0;
+}
+
+.check{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  font-weight:500;
+  color: rgba(0,0,0,.86);
+}
+.check input{
+  width:18px;
+  height:18px;
+  accent-color:#111;
+}
+
+/* Beta */
+.beta{
+  margin-top:14px;
+  text-align:center;
+  font-weight:600;
+  letter-spacing:.12em;
+  color: rgba(255,255,255,.28);
+  font-size:14px;
+}
+
+/* Images */
+.imgwrap{
+  width:100%;
+  margin-top:12px;
+  display:flex;
+  justify-content:center;
+}
+.img{
+  width:78%;
+  max-width:280px;
+  border-radius:22px;
+  background:#000;
+  box-shadow:0 18px 45px rgba(0,0,0,.45);
+}
+.img.wide{ width:90%; max-width:340px; }
+
+/* Footer button */
+.footer{
+  margin-top:18px;
+  display:flex;
+  justify-content:center;
+}
+
+.btn{
+  padding:14px 22px;
+  border-radius:999px;
+  border:0;
+  background: rgba(0,0,0,.45);
+  color:#fff;
+  font-weight:600;
+  font-size:15px;
+  letter-spacing:.2px;
+}
+.btn:disabled{ opacity:.35; }
+
+/* MODALS */
+.modal{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:50;
+}
+.modal.show{ display:flex; }
+
+.modalSheet{
+  width:min(420px, calc(100vw - 28px));
+  max-height:86vh;
+  overflow:auto;
+  background: rgba(200,200,200,.92);
+  border-radius:34px;
+  box-shadow:0 30px 90px rgba(0,0,0,.65);
+  padding:20px 18px 18px;
+  position:relative;
+  color:#0b0b0b;
+}
+
+.modalClose{
+  position:absolute;
+  left:14px;
+  top:12px;
+  width:30px;
+  height:30px;
+  border-radius:999px;
+  border:0;
+  background: rgba(0,0,0,.12);
+  font-size:20px;
+  font-weight:700;
+}
+
+.modalTitle{
+  padding-left:34px;
+  padding-right:10px;
+  font-size:20px;
+  font-weight:800;
+  margin:2px 0 12px;
+}
+
+.modalBody{ padding: 0 4px 6px; }
+
+.modalText{
+  font-size:15px;
+  line-height:1.28;
+  font-weight:500;
+  color: rgba(0,0,0,.82);
+}
+.modalText ul{ margin:10px 0 14px 18px; padding:0; }
+.modalText li{ margin-bottom:8px; }
+
+/* Small animation */
+.fade{ animation: fade .18s ease both; }
+@keyframes fade{
+  from{ opacity:0; transform: translateY(8px); }
+  to{ opacity:1; transform: translateY(0); }
+}
