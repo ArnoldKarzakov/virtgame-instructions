@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Пошаговая инструкция по активации Xbox-ключа"/>
+  <title>VirtGame - Инструкция</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="flow.js" defer></script>
+</head>
+<body>
+  <main class="app">
+
+    <!-- Верхняя панель: прогресс + кнопка помощи -->
+    <div class="top">
+      <div class="topInner">
+        <div class="progress" aria-label="Прогресс">
+          <div id="bar" class="bar"></div>
+        </div>
+        <button id="helpBtn" class="helpBtnTop" type="button">Помощь</button>
+      </div>
+    </div>
+
+    <!-- Центральный блок с текущим шагом -->
+    <section class="stage">
+      <div id="pill" class="pill">Инструкция для Xbox ключей</div>
+
+      <div class="card">
+        <div id="content"></div>
+
+        <div class="footer">
+          <button id="next" class="btn" type="button">Далее</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Модальное окно: помощь -->
+    <div
+      id="helpModal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="helpModalTitle"
+    >
+      <div class="modalSheet">
+        <button class="modalClose" id="helpClose" aria-label="Закрыть" type="button">×</button>
+        <div class="modalTitle" id="helpModalTitle">Как связаться с поддержкой?</div>
+        <div class="modalBody">
+          <div class="modalText">
+            Чтобы мы могли помочь быстро и по делу, сразу приложите:
+            <ul>
+              <li>скриншот ошибки на сайте Microsoft при активации кода;</li>
+              <li>скриншот окна VPN;</li>
+            </ul>
+            Без этих данных оператору всё равно придётся задавать уточняющие вопросы, и решение займёт больше времени.
+            <ul>
+              <li>Перейдите в раздел «Заказы» в приложении Яндекс.Маркет</li>
+              <li>Нажмите кнопку «Чат с продавцом»</li>
+            </ul>
+          </div>
+
+          <div class="imgwrap">
+            <img class="img wide" src="assets/help.png" alt="Чат с продавцом"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальное окно: условия VPN -->
+    <div
+      id="termsModal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="termsModalTitle"
+    >
+      <div class="modalSheet">
+        <button class="modalClose" id="termsClose" aria-label="Закрыть" type="button">×</button>
+        <div class="modalTitle" id="termsModalTitle">Условия использования VPN</div>
+        <div class="modalBody">
+          <div class="modalText">
+            <ul>
+              <li>VPN предоставляется в соответствии с ФЗ-149 «Об информации...» и предназначен только для шифрования соединения при активации кода/ключа.</li>
+              <li>Запрещено использовать VPN для обхода блокировок и доступа к ресурсам, ограниченным на территории РФ, а также для любых незаконных действий.</li>
+              <li>Сервис не рекламируется как средство обхода ограничений; инструкции по обходу блокировок не предоставляются.</li>
+              <li>Пользователь несёт персональную ответственность за соблюдение законодательства РФ.</li>
+              <li>Работоспособность VPN зависит от вашего провайдера и самого VPN и не контролируется магазином. Мы отвечаем только за корректность и работоспособность игрового кода Xbox.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</body>
+</html>
